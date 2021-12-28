@@ -1,4 +1,6 @@
+//--------------------------Score-------------------------------
 class Score {
+  private static instance:Score
   get totalScore() {
     const foods = Foods.getInstance();
     return foods.activeElementsScore.reduce((total, score) => total + score, 0);
@@ -7,7 +9,17 @@ class Score {
   render() {
     document.querySelector('.score__number')!.textContent = String(this.totalScore);
   }
+
+  private constructor() { }
+  static getInstance() {
+    if (!Score.instance) {
+      Score.instance = new Score();
+    }
+    return Score.instance;
+  }
 }
+
+//--------------------------Food-------------------------------
 class Food {
   constructor(public element: HTMLDivElement) {
     //.bindで
@@ -15,17 +27,21 @@ class Food {
   }
 
   clickEventHandler() {
-    console.log(this);
     this.element.classList.toggle("food-active");
-    const score = new Score();
+    const score = Score.getInstance();
     score.render()
   }
 }
+//--------------------------Foods-------------------------------
 class Foods {
   private static instance: Foods;
+  //foodをすべて取得
   elements = document.querySelectorAll<HTMLDivElement>(".food");
+  //初期化
   private _activeElements: HTMLDivElement[] = [];
   private _activeElementsScore: number[] = [];
+
+  //getter
   get activeElements() {
     this._activeElements = [];
     this.elements.forEach((element) => {
